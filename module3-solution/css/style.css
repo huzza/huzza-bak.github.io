@@ -1,0 +1,92 @@
+* {
+	box-sizing: border-box;
+}
+
+h1 {
+	color: blue;
+}
+
+section {
+	background-color: gray;
+	border: 1px solid black;
+	position: relative;
+  padding: 15px;
+  margin: 5px;
+}
+
+.bt {
+	text-align: center;
+	color: green;
+	border: 1px solid;
+	position: absolute;
+	width: 50%;
+	top: 0;
+	right: 0;
+}
+
+#book1 {
+	background-color: pink;
+}
+
+#book2 {
+	background-color: red;
+}
+
+#book3 {
+	background-color: yellow;
+}
+
+.row {
+	width: 100%;
+}
+
+/** HEADER **/
+.container {
+  margin-left: 10px;
+}
+
+#header-nav {
+  background-color: #f6b319;
+  border-radius: 0;
+  border: 0;
+}
+
+#logo-img {
+  background: url('../images/bookshelf.png') no-repeat;
+  width: 84px;
+  height: 60px;
+  margin: 5px;
+}
+
+.navbar-brand {
+  padding-top: 25px;
+}
+
+.navbar-brand h1 { /* Restaurant name */
+  font-family: 'Lora', serif;
+  color: #557c3e;
+  font-size: 1.5em;
+  text-transform: uppercase;
+  font-weight: bold;
+  text-shadow: 1px 1px 1px #222;
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: .75;
+}
+
+#nav-list {
+  background-color: lightblue;
+}
+
+hr {
+  width: 80%;
+  border-color: blue;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 768px) {
+  .col-sm-12 {
+      margin-bottom: 20px;
+  }
+}
