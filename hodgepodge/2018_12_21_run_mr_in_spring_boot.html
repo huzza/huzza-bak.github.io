@@ -1,0 +1,47 @@
+<h1 id="runmapreducejobinspringboot">Run MapReduce job in Spring-boot</h1>
+<h3 id="1firstideajustaddhadooprelatedjarsaspomdependenciesaddhadoopclasspathintoclasspathofruntime">1. First idea - just add hadoop* related jars as pom dependencies, add <code>hadoop classpath</code> into classpath of runtime</h3>
+<p>There are two advantages to do in this way: </p>
+<ul>
+<li>It will make the spring boot application jar huge, if we package hadoop jars into the application jar. </li>
+<li>The application jar will be independent of <em>Hadoop</em> system. Once the Hadoop upgrade. It only needs to update some configuration path for the application.</li>
+</ul>
+<p>In maven build, the dependencies could be by scope(see <a href="https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#Dependency_Scope">Maven Scope</a>). For this case, <code>provided</code> could be used, since those jars will be provided as runtime. Like:</p>
+<pre><code class="xml language-xml">        &lt;dependency&gt;
+            &lt;groupId&gt;org.apache.hadoop&lt;/groupId&gt;
+            &lt;artifactId&gt;hadoop-hdfs&lt;/artifactId&gt;
+            &lt;version&gt;2.7.3&lt;/version&gt;
+            &lt;scope&gt;provided&lt;/scope&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.apache.hadoop&lt;/groupId&gt;
+            &lt;artifactId&gt;hadoop-common&lt;/artifactId&gt;
+            &lt;version&gt;2.7.3&lt;/version&gt;
+            &lt;scope&gt;provided&lt;/scope&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.apache.hadoop&lt;/groupId&gt;
+            &lt;artifactId&gt;hadoop-mapreduce-client-common&lt;/artifactId&gt;
+            &lt;version&gt;2.7.3&lt;/version&gt;
+            &lt;scope&gt;provided&lt;/scope&gt;
+        &lt;/dependency&gt;
+</code></pre>
+<p>But the issue is when using <code>provided</code> scope, the <code>spring-boot-maven-plugin</code> would report error and can't build final jar. The alternation way is to remove <code>provided</code> scope, but add exclusions in <code>spring-boot-maven-plugin</code>. Like:</p>
+<pre><code class="xml language-xml">        &lt;plugin&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
+            &lt;configuration&gt;
+                &lt;excludeGroupIds&gt;org.apache.hadoop&lt;/excludeGroupIds&gt;
+            &lt;/configuration&gt;
+        &lt;/plugin&gt;
+</code></pre>
+<p>Then the jar is build successfully and hadoop related jars are not included. </p>
+<p>When start to deploy and launch the application jar, the original idea is to do like this way:</p>
+<pre><code class="bash language-bash">HDP_CLASSPATH=$(hadoop classpath)
+java -cp .:${HDP_CLASSPATH} -jar applicaiton.jar
+</code></pre>
+<p>But the bad new is - when launching java application using <code>java -jar applicaiton.jar</code> the <code>-cp</code> could not be used.... after reading spring-boot document, some says it is possible to use <a href="https://docs.spring.io/spring-boot/docs/current/reference/html/executable-jar.html">loader.path</a> to add extra jars.
+I tried that way. It doesn't work form me :(, but we found there is another way to start spring-boot application <code>org.springframework.boot.loader.JarLauncher</code>. Use JarLauncher, we can use traditional way to start spring-boot application jar. Below is the command to run:</p>
+<pre><code class="bash language-bash">HDP_CLASSPATH=$(hadoop classpath)
+java -cp .:applicaiton.jar:${HDP_CLASSPATH} org.springframework.boot.loader.JarLauncher
+</code></pre>
+<p>We hope it works, but it doesn't. JarLauncher will try to initialize <code>spring-*</code> stuffs in jar. And there are some web related jars existing in <code>hadoop classpath</code>. That will cause program initialization fail ... and it's hard to find out which jars in <code>hadoop classpath</code> cause that error.</p>
