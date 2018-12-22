@@ -8,4 +8,4 @@
 
 ### Technical Hodgepodge 
 
-- [Run MapReduce in Spring-boot(2018/11/21)](hodgepodge/2018_12_21_run_mr_in_spring_boot.html)
+- [Run MapReduce in Spring-boot](hodgepodge/2018_12_21_run_mr_in_spring_boot.html) (2018/11/21)
